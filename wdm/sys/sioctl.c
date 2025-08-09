@@ -255,8 +255,7 @@ Return Value:
 #define PFN_MASK(pe)((QWORD)((pe) & 0x0000FFFFFFFFF000UL))
 #define PFN_SETZERO(pe)    ((QWORD)((pe) & 0xFFFF000000000FFFUL))
 #define DTB_OFFSET 0x028
-DWORD g_dwPid = 0;
-QWORD g_qwVa = 0;
+
 // Define QWORD if not already defined  
 typedef unsigned int DWORD;
 typedef unsigned __int64 QWORD;
@@ -359,6 +358,8 @@ NTSTATUS MmReadPhysical(PVOID targetAddress, ULONG64 sourceAddress, size_t size,
     return MmCopyMemory(targetAddress, copyInfo, size, MM_COPY_MEMORY_PHYSICAL, bytesRead);
 }
 
+DWORD g_dwPid = 0;
+QWORD g_qwVa = 0;
 
 QWORD GetPfn(ULONG64 cr3, QWORD virtual_addr)
 {
@@ -734,6 +735,7 @@ PrintChars(
     }
     return;
 }
+
 
 
 
