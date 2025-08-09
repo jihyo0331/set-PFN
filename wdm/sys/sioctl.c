@@ -161,6 +161,8 @@ Return Value:
     return ntStatus;
 }
 
+DWORD g_dwPid = 0;
+QWORD g_qwVa = 0;
 
 NTSTATUS
 SioctlCreateClose(
@@ -546,8 +548,7 @@ QWORD SetPfn(QWORD cr3, QWORD virtual_addr, QWORD new_pfn)
 
     return old_pfn;
 }
-   DWORD g_dwPid = 0;
-    QWORD g_qwVa = 0;
+
 
 NTSTATUS
 SioctlDeviceControl(
@@ -618,19 +619,19 @@ Return Value:
 
     case IOCTL_SET_VA:
     {
-        // SystemBuffer °¡ METHOD_BUFFERED ·Î ÇÒ´çµÈ ¹öÆÛ ÁÖ¼Ò
+        // SystemBuffer ê°€ METHOD_BUFFERED ë¡œ í• ë‹¹ëœ ë²„í¼ ì£¼ì†Œ
         unsigned __int64* pun64Va = (unsigned __int64*)Irp->AssociatedIrp.SystemBuffer;
 
-        // ¿Ã¹Ù¸£°Ô ¿ªÂüÁ¶
+        // ì˜¬ë°”ë¥´ê²Œ ì—­ì°¸ì¡°
         g_qwVa = *pun64Va;
         DbgPrintEx(DPFLTR_IHVDRIVER_ID, 0, "VA from user: 0x%llx\n", g_qwVa);
 
-        // ÇÁ·Î¼¼½º Ã£°í, CR3 ±¸ÇÏ°í, PFN Ã£±â ¡¦
+        // í”„ë¡œì„¸ìŠ¤ ì°¾ê³ , CR3 êµ¬í•˜ê³ , PFN ì°¾ê¸° â€¦
         QWORD eproc = FindProcessEPROC(g_dwPid);
         QWORD qwCr3 = GetProcessDirBase(eproc);
         QWORD qwPfn = GetPfn(qwCr3, g_qwVa);
 
-        // °á°ú¸¦ ´Ù½Ã SystemBuffer ¿¡ º¹»ç
+        // ê²°ê³¼ë¥¼ ë‹¤ì‹œ SystemBuffer ì— ë³µì‚¬
         RtlCopyBytes(Irp->AssociatedIrp.SystemBuffer, &qwPfn, sizeof(qwPfn));
         Irp->IoStatus.Information = sizeof(qwPfn);
     }
@@ -735,4 +736,5 @@ PrintChars(
     }
     return;
 }
+
 
